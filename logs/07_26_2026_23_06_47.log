@@ -1,0 +1,6 @@
+[ 2026-07-26 23:06:47,876 ] 21 root - INFO - logging Has Started
+[ 2026-07-26 23:06:49,262 ] 12 root - INFO - Initiate data ingestion
+[ 2026-07-26 23:06:51,161 ] 58 root - INFO - Data has been splitted into train and test
+[ 2026-07-26 23:06:51,161 ] 60 root - INFO - Exited split_data_train_test method od dataingestion class
+[ 2026-07-26 23:06:51,161 ] 64 root - INFO - Exporting test and train files
+[ 2026-07-26 23:06:51,197 ] 68 root - INFO - Exported test and train files

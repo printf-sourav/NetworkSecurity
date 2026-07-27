@@ -1,0 +1,13 @@
+[ 2026-07-27 00:51:23,229 ] 21 root - INFO - logging Has Started
+[ 2026-07-27 00:51:24,689 ] 13 root - INFO - Initiate data ingestion
+[ 2026-07-27 00:51:26,701 ] 58 root - INFO - Data has been splitted into train and test
+[ 2026-07-27 00:51:26,701 ] 60 root - INFO - Exited split_data_train_test method od dataingestion class
+[ 2026-07-27 00:51:26,701 ] 64 root - INFO - Exporting test and train files
+[ 2026-07-27 00:51:26,735 ] 68 root - INFO - Exported test and train files
+[ 2026-07-27 00:51:26,735 ] 15 root - INFO - Data ingestion completed
+[ 2026-07-27 00:51:26,738 ] 19 root - INFO - Initiate The data vaildation
+[ 2026-07-27 00:51:26,837 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-27 00:51:26,837 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-27 00:51:26,837 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-27 00:51:26,837 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-27 00:51:26,986 ] 21 root - INFO - Data validation completed

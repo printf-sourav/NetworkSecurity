@@ -23,9 +23,12 @@ from sklearn.ensemble import (
 import mlflow
 from networksecurity.utils.main_utils.utils import evaluate_models
 
+import dagshub
+dagshub.init(repo_owner='printf-sourav', repo_name='NetworkSecurity', mlflow=True)
+
 
 class ModelTrainer:
-    def __init__(self,data_transformation_artifact:DataTransformationArtifact,model_trainer_config:ModelTrainerArtifact):
+    def __init__(self,data_transformation_artifact:DataTransformationArtifact,model_trainer_config:ModelTrainerConfig):
         try:
             self.data_transformation_artifact=data_transformation_artifact
             self.model_trainer_config=model_trainer_config
@@ -103,6 +106,8 @@ class ModelTrainer:
         os.makedirs(model_dir_path,exist_ok=True)
         network_model=NetworkModel(preprocessor=preprocessor,model=best_model)
         save_object(self.model_trainer_config.trained_model_file_path,obj=network_model)
+
+        save_object("final_model/model.pkl",best_model)
 
 
         model_trainer_artifact=ModelTrainerArtifact(trained_model_file_path=self.model_trainer_config.trained_model_file_path,trained_metric_artifact=classification_train_metric,test_metric_artifact=classification_test_metric)

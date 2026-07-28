@@ -1,0 +1,33 @@
+[ 2026-07-28 02:27:58,720 ] 21 root - INFO - logging Has Started
+[ 2026-07-28 02:28:02,868 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:28:02,953 ] 107 dagshub - INFO - Accessing as printf-sourav
+[ 2026-07-28 02:28:04,317 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/repos/printf-sourav/NetworkSecurity "HTTP/1.1 200 OK"
+[ 2026-07-28 02:28:05,733 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:28:05,809 ] 107 dagshub - INFO - Initialized MLflow to track repo "printf-sourav/NetworkSecurity"
+[ 2026-07-28 02:28:05,812 ] 107 dagshub - INFO - Repository printf-sourav/NetworkSecurity initialized!
+[ 2026-07-28 02:28:06,187 ] 42 root - INFO - Start data Ingestion
+[ 2026-07-28 02:28:08,260 ] 58 root - INFO - Data has been splitted into train and test
+[ 2026-07-28 02:28:08,260 ] 60 root - INFO - Exited split_data_train_test method od dataingestion class
+[ 2026-07-28 02:28:08,261 ] 64 root - INFO - Exporting test and train files
+[ 2026-07-28 02:28:08,308 ] 68 root - INFO - Exported test and train files
+[ 2026-07-28 02:28:08,308 ] 45 root - INFO - Data Ingestion completed and artifact: DataIngestionArtifact(trained_file_path='Artifacts\\07_28_2026_02_27_59\\data_ingestion\\ingested\\train.csv', test_file_path='Artifacts\\07_28_2026_02_27_59\\data_ingestion\\ingested\\test.csv')
+[ 2026-07-28 02:28:08,310 ] 55 root - INFO - Initiate the data Validation
+[ 2026-07-28 02:28:08,379 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-28 02:28:08,379 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-28 02:28:08,379 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-28 02:28:08,379 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-28 02:28:08,588 ] 98 root - INFO - Data validation artifact: DataValidationArtifact(validation_status=True, valid_train_file_path='Artifacts\\07_28_2026_02_27_59\\data_validation\\validated\\train.csv', valid_test_file_path='Artifacts\\07_28_2026_02_27_59\\data_validation\\validated\\test.csv', invalid_train_file_path=None, invalid_test_file_path=None, drift_report_file_path='Artifacts\\07_28_2026_02_27_59\\data_validation\\drift_report\\report.yaml')
+[ 2026-07-28 02:28:08,588 ] 47 root - INFO - Entered inititate data transformation method
+[ 2026-07-28 02:28:08,588 ] 50 root - INFO - Starting data transformation
+[ 2026-07-28 02:28:08,646 ] 36 root - INFO - Entered get_data_transformation_object
+[ 2026-07-28 02:28:08,646 ] 39 root - INFO - KNN IMPUTER INITIALIZE
+[ 2026-07-28 02:28:08,670 ] 31 root - INFO - Enter the object saving method
+[ 2026-07-28 02:28:08,673 ] 35 root - INFO - File objects sabed
+[ 2026-07-28 02:28:08,673 ] 31 root - INFO - Enter the object saving method
+[ 2026-07-28 02:28:08,676 ] 35 root - INFO - File objects sabed
+[ 2026-07-28 02:33:30,102 ] 41 root - INFO - LOADING OBJECT
+[ 2026-07-28 02:33:30,127 ] 31 root - INFO - Enter the object saving method
+[ 2026-07-28 02:33:30,167 ] 35 root - INFO - File objects sabed
+[ 2026-07-28 02:33:30,167 ] 31 root - INFO - Enter the object saving method
+[ 2026-07-28 02:33:30,213 ] 35 root - INFO - File objects sabed
+[ 2026-07-28 02:33:30,213 ] 114 root - INFO - Model trainer artifact: ModelTrainerArtifact(trained_model_file_path='Artifacts\\07_28_2026_02_27_59\\model_trainer\\trained_model\\model.pkl', trained_metric_artifact=ClassificationMetricArtifact(f1_score=0.9912814274128142, precision_score=0.9896761133603239, recall_score=0.9928919577579204), test_metric_artifact=ClassificationMetricArtifact(f1_score=0.9742765273311897, precision_score=0.9657370517928286, recall_score=0.9829683698296837))

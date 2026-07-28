@@ -1,0 +1,7 @@
+[ 2026-07-28 02:15:39,077 ] 21 root - INFO - logging Has Started
+[ 2026-07-28 02:15:43,731 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:15:43,809 ] 107 dagshub - INFO - Accessing as printf-sourav
+[ 2026-07-28 02:15:48,218 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/repos/printf-sourav/NetworkSecurity "HTTP/1.1 200 OK"
+[ 2026-07-28 02:15:49,538 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:15:49,612 ] 107 dagshub - INFO - Initialized MLflow to track repo "printf-sourav/NetworkSecurity"
+[ 2026-07-28 02:15:49,614 ] 107 dagshub - INFO - Repository printf-sourav/NetworkSecurity initialized!

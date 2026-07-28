@@ -1,0 +1,18 @@
+[ 2026-07-28 02:16:16,189 ] 21 root - INFO - logging Has Started
+[ 2026-07-28 02:16:20,664 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:16:20,749 ] 107 dagshub - INFO - Accessing as printf-sourav
+[ 2026-07-28 02:16:25,232 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/repos/printf-sourav/NetworkSecurity "HTTP/1.1 200 OK"
+[ 2026-07-28 02:16:26,540 ] 1025 httpx - INFO - HTTP Request: GET https://dagshub.com/api/v1/user "HTTP/1.1 200 OK"
+[ 2026-07-28 02:16:26,616 ] 107 dagshub - INFO - Initialized MLflow to track repo "printf-sourav/NetworkSecurity"
+[ 2026-07-28 02:16:26,619 ] 107 dagshub - INFO - Repository printf-sourav/NetworkSecurity initialized!
+[ 2026-07-28 02:16:26,731 ] 38 root - INFO - Start Data ingestion
+[ 2026-07-28 02:16:29,943 ] 58 root - INFO - Data has been splitted into train and test
+[ 2026-07-28 02:16:29,943 ] 60 root - INFO - Exited split_data_train_test method od dataingestion class
+[ 2026-07-28 02:16:29,943 ] 64 root - INFO - Exporting test and train files
+[ 2026-07-28 02:16:29,980 ] 68 root - INFO - Exported test and train files
+[ 2026-07-28 02:16:29,980 ] 41 root - INFO - Data ingestion completed
+[ 2026-07-28 02:16:30,046 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-28 02:16:30,046 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-28 02:16:30,046 ] 31 root - INFO - Required No of columns: 3
+[ 2026-07-28 02:16:30,046 ] 32 root - INFO - Df has columns: 31
+[ 2026-07-28 02:16:30,335 ] 98 root - INFO - Data validation artifact: DataValidationArtifact(validation_status=True, valid_train_file_path='Artifacts\\07_28_2026_02_16_16\\data_validation\\validated\\train.csv', valid_test_file_path='Artifacts\\07_28_2026_02_16_16\\data_validation\\validated\\test.csv', invalid_train_file_path=None, invalid_test_file_path=None, drift_report_file_path='Artifacts\\07_28_2026_02_16_16\\data_validation\\drift_report\\report.yaml')

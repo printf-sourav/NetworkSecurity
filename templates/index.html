@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetworkSecurity — Phishing Detection Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss:#090D14;
+    --panel:#0F1622;
+    --panel-raised:#141D2C;
+    --hairline:#212B3B;
+    --hairline-soft:#1A2332;
+    --text:#E8EDF5;
+    --text-muted:#8492A8;
+    --text-faint:#56637A;
+    --teal:#37C7AE;
+    --teal-dim:rgba(55,199,174,0.14);
+    --rose:#E8496B;
+    --rose-dim:rgba(232,73,107,0.14);
+    --amber:#E4A94A;
+    --amber-dim:rgba(228,169,74,0.14);
+    --radius:10px;
+    --display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(55,199,174,0.06), transparent 60%),
+      radial-gradient(900px 500px at 5% 0%, rgba(232,73,107,0.05), transparent 55%),
+      var(--abyss);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;}
+  ::selection{background:var(--teal-dim);color:var(--text);}
+
+  :focus-visible{
+    outline:2px solid var(--teal);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(9,13,20,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--hairline-soft);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;max-width:1180px;margin:0 auto;
+  }
+  .wordmark{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:13px;letter-spacing:0.06em;
+    text-decoration:none;color:var(--text);
+  }
+  .wordmark .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 0 3px var(--teal-dim);
+  }
+  .wordmark b{font-weight:600;}
+  .wordmark span{color:var(--text-faint);}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{
+    font-size:13.5px;text-decoration:none;color:var(--text-muted);
+    font-weight:500;transition:color .15s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a.docs{
+    font-family:var(--mono);font-size:12px;color:var(--text-muted);
+    border:1px solid var(--hairline);padding:6px 12px;border-radius:6px;
+    transition:border-color .15s ease,color .15s ease;
+  }
+  .nav-links a.docs:hover{border-color:var(--teal);color:var(--teal);}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:76px 0 64px;}
+  .hero-grid{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:0.14em;
+    color:var(--teal);text-transform:uppercase;margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{
+    content:'';width:18px;height:1px;background:var(--teal);display:inline-block;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(36px,4.6vw,56px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+    font-weight:600;
+  }
+  h1 .accent{color:var(--teal);}
+  .hero p.lede{
+    font-size:16.5px;color:var(--text-muted);max-width:52ch;margin:0 0 32px;
+  }
+  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--body);font-weight:600;font-size:14.5px;
+    padding:12px 22px;border-radius:8px;border:1px solid transparent;
+    cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s ease,box-shadow .15s ease,background .15s ease,border-color .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{
+    background:var(--teal);color:#04211C;
+    box-shadow:0 0 0 0 rgba(55,199,174,0);
+  }
+  .btn-primary:hover{box-shadow:0 6px 24px -8px rgba(55,199,174,0.55);}
+  .btn-ghost{
+    background:transparent;color:var(--text);border-color:var(--hairline);
+  }
+  .btn-ghost:hover{border-color:var(--text-muted);}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;box-shadow:none;transform:none;}
+
+  /* ---------- FINGERPRINT SIGNATURE ---------- */
+  .scanner-card{
+    background:var(--panel);border:1px solid var(--hairline);border-radius:14px;
+    padding:26px;position:relative;overflow:hidden;
+  }
+  .scanner-label{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;
+    display:flex;justify-content:space-between;
+  }
+  .fingerprint{
+    position:relative;height:120px;
+    display:flex;align-items:flex-end;gap:3px;
+    padding:0 2px;
+  }
+  .fingerprint .tick{
+    flex:1;border-radius:2px 2px 0 0;
+    background:var(--hairline);
+    transition:background .4s ease,height .4s ease;
+  }
+  .sweep{
+    position:absolute;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,transparent,rgba(232,237,245,0.9),transparent);
+    filter:drop-shadow(0 0 6px rgba(232,237,245,0.6));
+    animation:sweep 3.6s ease-in-out infinite;
+  }
+  @keyframes sweep{
+    0%{left:0%;opacity:0;}
+    8%{opacity:1;}
+    48%{left:100%;opacity:1;}
+    56%{opacity:0;}
+    100%{left:100%;opacity:0;}
+  }
+  .verdict-row{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline-soft);
+  }
+  .verdict-pill{
+    font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:0.02em;
+    padding:7px 14px;border-radius:20px;
+    display:inline-flex;align-items:center;gap:8px;
+    animation:fadeSwap 7.2s ease-in-out infinite;
+  }
+  .verdict-pill .ring{width:7px;height:7px;border-radius:50%;}
+  .scanner-caption{font-size:12px;color:var(--text-faint);max-width:22ch;text-align:right;}
+
+  /* alternating demo state, purely decorative */
+  .fingerprint[data-phase="legit"] .verdict-pill,
+  .verdict-pill.legit{background:var(--teal-dim);color:var(--teal);}
+  .verdict-pill.legit .ring{background:var(--teal);box-shadow:0 0 8px var(--teal);}
+  .verdict-pill.phish{background:var(--rose-dim);color:var(--rose);}
+  .verdict-pill.phish .ring{background:var(--rose);box-shadow:0 0 8px var(--rose);}
+
+  @media (prefers-reduced-motion:reduce){
+    .sweep{display:none;}
+    .verdict-pill{animation:none;}
+  }
+
+  /* ---------- STAT STRIP ---------- */
+  .stat-strip{
+    border-top:1px solid var(--hairline-soft);
+    border-bottom:1px solid var(--hairline-soft);
+    padding:28px 0;
+  }
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+  .stat{padding:0 32px;position:relative;}
+  .stat + .stat{border-left:1px solid var(--hairline-soft);}
+  .stat-value{
+    font-family:var(--display);font-size:30px;font-weight:600;
+    display:flex;align-items:center;gap:10px;
+  }
+  .stat-label{font-size:13px;color:var(--text-muted);margin-top:4px;}
+  .status-dot{width:9px;height:9px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+  .status-dot.ready{background:var(--teal);box-shadow:0 0 8px var(--teal);}
+  .status-dot.pending{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+
+  /* ---------- SECTIONS ---------- */
+  section.block{padding:72px 0;}
+  .section-head{margin-bottom:36px;}
+  .section-head .eyebrow{margin-bottom:10px;}
+  .section-head h2{
+    font-family:var(--display);font-size:28px;font-weight:600;margin:0 0 8px;
+  }
+  .section-head p{color:var(--text-muted);font-size:15px;margin:0;max-width:60ch;}
+
+  .panels{display:grid;grid-template-columns:0.85fr 1.15fr;gap:24px;align-items:start;}
+  @media (max-width:900px){.panels{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--hairline);border-radius:14px;
+    padding:28px;
+  }
+  .card h3{font-family:var(--display);font-size:17px;margin:0 0 6px;font-weight:600;}
+  .card .sub{color:var(--text-muted);font-size:13.5px;margin:0 0 22px;}
+
+  /* pipeline step tracker — a real ordered sequence, so numbering is earned */
+  .steps{display:flex;flex-direction:column;gap:0;margin-bottom:24px;}
+  .step{
+    display:flex;gap:14px;padding:12px 0;position:relative;
+  }
+  .step:not(:last-child)::after{
+    content:'';position:absolute;left:12px;top:34px;bottom:-2px;width:1px;
+    background:var(--hairline);
+  }
+  .step-num{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    width:24px;height:24px;border-radius:50%;border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    background:var(--panel-raised);transition:all .2s ease;
+  }
+  .step.active .step-num{border-color:var(--amber);color:var(--amber);}
+  .step.done .step-num{border-color:var(--teal);color:var(--teal);background:var(--teal-dim);}
+  .step-body{padding-top:2px;}
+  .step-title{font-size:13.5px;font-weight:600;}
+  .step-desc{font-size:12.5px;color:var(--text-faint);margin-top:1px;}
+
+  .train-status{
+    font-family:var(--mono);font-size:12.5px;color:var(--text-faint);
+    min-height:18px;margin-bottom:14px;
+  }
+  .metric-row{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .metric{}
+  .metric-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;}
+  .metric-top .name{color:var(--text-muted);}
+  .metric-top .val{font-family:var(--mono);color:var(--text);}
+  .meter{height:5px;border-radius:3px;background:var(--hairline-soft);overflow:hidden;}
+  .meter-fill{height:100%;background:var(--teal);width:0%;transition:width .6s ease;border-radius:3px;}
+
+  .banner{
+    font-size:13px;padding:11px 14px;border-radius:8px;margin-bottom:16px;
+    display:none;align-items:flex-start;gap:8px;line-height:1.4;
+  }
+  .banner.show{display:flex;}
+  .banner.err{background:var(--rose-dim);color:#f5b6c3;border:1px solid rgba(232,73,107,0.3);}
+  .banner.ok{background:var(--teal-dim);color:#a9ebe0;border:1px solid rgba(55,199,174,0.3);}
+  .banner.warn{background:var(--amber-dim);color:#f2d9a8;border:1px solid rgba(228,169,74,0.3);}
+
+  /* ---------- DROPZONE ---------- */
+  .dropzone{
+    border:1.5px dashed var(--hairline);border-radius:10px;
+    padding:34px 20px;text-align:center;cursor:pointer;
+    transition:border-color .15s ease,background .15s ease;
+    margin-bottom:18px;
+  }
+  .dropzone.drag{border-color:var(--teal);background:var(--teal-dim);}
+  .dropzone.disabled{opacity:0.5;cursor:not-allowed;}
+  .dropzone input{display:none;}
+  .dz-icon{font-family:var(--mono);font-size:22px;color:var(--text-faint);margin-bottom:10px;}
+  .dz-title{font-size:14px;font-weight:600;}
+  .dz-sub{font-size:12.5px;color:var(--text-faint);margin-top:4px;}
+  .dz-file{font-family:var(--mono);font-size:12.5px;color:var(--teal);margin-top:10px;}
+
+  .scan-actions{display:flex;gap:10px;align-items:center;}
+
+  /* ---------- RESULTS ---------- */
+  .results-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:18px;flex-wrap:wrap;gap:14px;
+  }
+  .summary-bar{display:flex;gap:22px;flex-wrap:wrap;}
+  .summary-item{font-family:var(--mono);font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:7px;}
+  .summary-item b{color:var(--text);font-size:15px;font-family:var(--display);}
+  .proportion{
+    display:flex;height:6px;border-radius:3px;overflow:hidden;width:180px;background:var(--hairline-soft);
+  }
+  .proportion .p-legit{background:var(--teal);height:100%;}
+  .proportion .p-phish{background:var(--rose);height:100%;}
+
+  .filters{display:flex;gap:6px;}
+  .chip{
+    font-family:var(--mono);font-size:11.5px;padding:6px 12px;border-radius:20px;
+    border:1px solid var(--hairline);color:var(--text-muted);cursor:pointer;
+    background:transparent;transition:all .15s ease;
+  }
+  .chip.active{border-color:var(--text-muted);color:var(--text);background:var(--panel-raised);}
+
+  .table-wrap{
+    border:1px solid var(--hairline);border-radius:12px;overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--text-faint);font-weight:500;
+    padding:12px 16px;background:var(--panel-raised);border-bottom:1px solid var(--hairline);
+  }
+  tbody td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);font-size:13px;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(255,255,255,0.015);}
+  td.idx{font-family:var(--mono);color:var(--text-faint);width:48px;}
+  .row-fp{display:flex;align-items:flex-end;gap:1.5px;height:26px;width:150px;cursor:help;}
+  .row-fp i{flex:1;border-radius:1px;background:var(--hairline);display:block;}
+  .badge{
+    font-family:var(--mono);font-size:11.5px;font-weight:600;padding:4px 10px;
+    border-radius:5px;display:inline-block;letter-spacing:0.02em;
+  }
+  .badge.legit{background:var(--teal-dim);color:var(--teal);}
+  .badge.phish{background:var(--rose-dim);color:var(--rose);}
+  .badge.unknown{background:var(--hairline-soft);color:var(--text-faint);}
+
+  .empty-state{
+    padding:56px 24px;text-align:center;color:var(--text-faint);
+  }
+  .empty-state .glyph{font-family:var(--mono);font-size:26px;color:var(--hairline);margin-bottom:10px;}
+  .empty-state p{margin:0;font-size:13.5px;}
+
+  .results-footnote{font-size:12px;color:var(--text-faint);margin-top:14px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--hairline-soft);padding:32px 0 48px;}
+  .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .stack-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .stack-chips span{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    border:1px solid var(--hairline);padding:5px 10px;border-radius:6px;
+  }
+  .foot-note{font-size:12px;color:var(--text-faint);}
+
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:1fr;}
+    .stat + .stat{border-left:none;border-top:1px solid var(--hairline-soft);padding-top:20px;margin-top:20px;}
+    .nav-links{gap:16px;}
+    .wrap{padding:0 20px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="wordmark"><span class="dot"></span><b>NETWORKSECURITY</b><span>// phish-detect</span></a>
+    <div class="nav-links">
+      <a href="#train">Train</a>
+      <a href="#scan">Scan</a>
+      <a href="/docs" class="docs" target="_blank" rel="noopener">API docs ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Phishing detection engine</p>
+      <h1>Thirty signals in.<br><span class="accent">One verdict out.</span></h1>
+      <p class="lede">Every submitted URL is read as a vector of thirty structural and behavioral signals — SSL state, domain age, redirect patterns, DNS records — then scored by a trained classifier as legitimate or phishing.</p>
+      <div class="hero-ctas">
+        <a href="#scan" class="btn btn-primary">Run a batch scan</a>
+        <a href="#train" class="btn btn-ghost">Retrain the model</a>
+      </div>
+    </div>
+
+    <div class="scanner-card">
+      <div class="scanner-label"><span>live signal read</span><span id="fpPhaseLabel">sample vector</span></div>
+      <div class="fingerprint" id="heroFingerprint"><div class="sweep"></div></div>
+      <div class="verdict-row">
+        <span class="verdict-pill legit" id="heroVerdict"><span class="ring"></span>Legitimate</span>
+        <span class="scanner-caption">Illustrative read of a 30-signal vector, not a live scan</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stat-strip">
+  <div class="wrap stat-grid">
+    <div class="stat">
+      <div class="stat-value" id="statRows">—</div>
+      <div class="stat-label">Rows in training dataset</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="statFeatures">—</div>
+      <div class="stat-label">Signals read per URL</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value"><span class="status-dot" id="statusDot"></span><span id="statModel">Checking…</span></div>
+      <div class="stat-label" id="statModelSub">Model status</div>
+    </div>
+  </div>
+</div>
+
+<section class="block" id="train">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Model training</p>
+      <h2>Rebuild the classifier from scratch</h2>
+      <p>Runs the full pipeline against the current dataset: ingestion, schema validation, transformation, then training. This can take a while — the button stays disabled until it finishes.</p>
+    </div>
+
+    <div class="panels">
+      <div class="card">
+        <h3>Pipeline stages</h3>
+        <p class="sub">Runs in this order, every time.</p>
+        <div class="steps" id="pipelineSteps">
+          <div class="step" data-step="1">
+            <div class="step-num">01</div>
+            <div class="step-body"><div class="step-title">Data ingestion</div><div class="step-desc">Pull the dataset, split train / test</div></div>
+          </div>
+          <div class="step" data-step="2">
+            <div class="step-num">02</div>
+            <div class="step-body"><div class="step-title">Validation</div><div class="step-desc">Check against the schema, flag drift</div></div>
+          </div>
+          <div class="step" data-step="3">
+            <div class="step-num">03</div>
+            <div class="step-body"><div class="step-title">Transformation</div><div class="step-desc">Impute and encode the signal columns</div></div>
+          </div>
+          <div class="step" data-step="4">
+            <div class="step-num">04</div>
+            <div class="step-body"><div class="step-title">Model training</div><div class="step-desc">Fit and score the classifier</div></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="trainBtn" style="width:100%;justify-content:center;">Retrain model</button>
+      </div>
+
+      <div class="card">
+        <h3>Training report</h3>
+        <p class="sub">Populated after the pipeline finishes a run.</p>
+        <div class="banner" id="trainBanner"></div>
+        <div class="train-status" id="trainStatus">No run started yet.</div>
+
+        <div id="metricsBlock" style="display:none;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-faint);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">Train split</div>
+          <div class="metric-row" id="trainMetrics"></div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-faint);letter-spacing:0.06em;text-transform:uppercase;margin:20px 0 8px;">Test split</div>
+          <div class="metric-row" id="testMetrics"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="scan">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Batch scan</p>
+      <h2>Score a CSV of candidate URLs</h2>
+      <p>Upload a CSV with the same thirty signal columns as the training schema. Each row is scored and returned with a verdict, without ever leaving this page.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:28px;">
+      <div class="banner" id="scanBanner"></div>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept=".csv">
+        <div class="dz-icon">↑</div>
+        <div class="dz-title">Drop a CSV, or click to browse</div>
+        <div class="dz-sub">Expects the 30 schema columns — no target column required</div>
+        <div class="dz-file" id="fileName"></div>
+      </div>
+      <div class="scan-actions">
+        <button class="btn btn-primary" id="scanBtn" disabled>Run batch scan</button>
+        <button class="btn btn-ghost" id="downloadBtn" style="display:none;">Download results (.csv)</button>
+      </div>
+    </div>
+
+    <div class="results-head">
+      <div class="summary-bar" id="summaryBar" style="display:none;">
+        <div class="summary-item"><b id="sumTotal">0</b> scanned</div>
+        <div class="summary-item"><b id="sumLegit" style="color:var(--teal);">0</b> legitimate</div>
+        <div class="summary-item"><b id="sumPhish" style="color:var(--rose);">0</b> phishing</div>
+        <div class="proportion"><div class="p-legit" id="propLegit"></div><div class="p-phish" id="propPhish"></div></div>
+      </div>
+      <div class="filters" id="filters" style="display:none;">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="phish">Phishing</button>
+        <button class="chip" data-filter="legit">Legitimate</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="resultsTable" style="display:none;">
+        <thead><tr><th style="width:48px;">#</th><th>Signal fingerprint</th><th style="width:140px;">Verdict</th></tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState">
+        <div class="glyph">···</div>
+        <p>No scans yet — drop a CSV above to see verdicts here.</p>
+      </div>
+    </div>
+    <p class="results-footnote">Signal reads follow the dataset's own scoring: 1 marks a legitimate-leaning signal, −1 phishing-leaning, 0 suspicious. Hover a fingerprint for the raw values.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="stack-chips">
+      <span>FastAPI</span><span>scikit-learn</span><span>MongoDB</span><span>MLflow</span><span>Docker</span>
+    </div>
+    <div class="foot-note">Verdicts are model output, not a guarantee — treat low-confidence batches as a prompt for manual review.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const FEATURE_COUNT = 30;
+
+  function rngRow(seed){
+    // deterministic-ish pseudo pattern for the decorative hero fingerprint
+    const vals = [];
+    for(let i=0;i<FEATURE_COUNT;i++){
+      const n = Math.sin(seed*13.37 + i*7.13) * 10000;
+      const frac = n - Math.floor(n);
+      vals.push(frac < 0.33 ? -1 : (frac < 0.5 ? 0 : 1));
+    }
+    return vals;
+  }
+
+  function paintFingerprint(el, values, colored){
+    el.querySelectorAll('.tick').forEach(t=>t.remove());
+    values.forEach(v=>{
+      const tick = document.createElement('div');
+      tick.className = 'tick';
+      let h, bg;
+      if(v === 1){ h = 90; bg = 'var(--teal)'; }
+      else if(v === -1){ h = 55 + Math.random()*10; bg = 'var(--rose)'; }
+      else { h = 35; bg = 'var(--amber)'; }
+      tick.style.height = h + '%';
+      if(colored) tick.style.background = bg;
+      el.appendChild(tick);
+    });
+  }
+
+  // Hero decorative scanner: alternate between a "legitimate" and "phishing" looking read
+  const heroFp = document.getElementById('heroFingerprint');
+  const heroVerdict = document.getElementById('heroVerdict');
+  const phaseLabel = document.getElementById('fpPhaseLabel');
+  let phase = 0;
+  function cycleHero(){
+    phase++;
+    const legitLeaning = phase % 2 === 0;
+    const values = rngRow(phase).map(v => {
+      if(legitLeaning) return Math.random() < 0.72 ? 1 : (Math.random() < 0.5 ? 0 : -1);
+      return Math.random() < 0.68 ? -1 : (Math.random() < 0.5 ? 0 : 1);
+    });
+    paintFingerprint(heroFp, values, true);
+    if(legitLeaning){
+      heroVerdict.className = 'verdict-pill legit';
+      heroVerdict.innerHTML = '<span class="ring"></span>Legitimate';
+      phaseLabel.textContent = 'sample vector · legit-leaning';
+    } else {
+      heroVerdict.className = 'verdict-pill phish';
+      heroVerdict.innerHTML = '<span class="ring"></span>Phishing';
+      phaseLabel.textContent = 'sample vector · phish-leaning';
+    }
+  }
+  cycleHero();
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!prefersReduced){
+    setInterval(cycleHero, 3600);
+  }
+
+  // ---------- STATUS ----------
+  async function loadStatus(){
+    try{
+      const res = await fetch('/status');
+      if(!res.ok) throw new Error('status unavailable');
+      const data = await res.json();
+      document.getElementById('statRows').textContent = data.dataset_rows != null ? data.dataset_rows.toLocaleString() : '—';
+      document.getElementById('statFeatures').textContent = data.feature_count != null ? data.feature_count : '—';
+
+      const dot = document.getElementById('statusDot');
+      const modelEl = document.getElementById('statModel');
+      const subEl = document.getElementById('statModelSub');
+      if(data.model_ready){
+        dot.className = 'status-dot ready';
+        modelEl.textContent = 'Ready';
+        const d = data.trained_at ? new Date(data.trained_at*1000) : null;
+        subEl.textContent = d ? ('Trained ' + d.toLocaleDateString() + ' · scans enabled') : 'Model status';
+        document.getElementById('dropzone').classList.remove('disabled');
+      } else {
+        dot.className = 'status-dot pending';
+        modelEl.textContent = 'Not trained yet';
+        subEl.textContent = 'Train the model before scanning';
+        document.getElementById('dropzone').classList.add('disabled');
+      }
+      return data;
+    }catch(e){
+      document.getElementById('statModel').textContent = 'Unavailable';
+      document.getElementById('statModelSub').textContent = 'Could not reach /status';
+    }
+  }
+  loadStatus();
+
+  // ---------- TRAIN ----------
+  const trainBtn = document.getElementById('trainBtn');
+  const trainStatus = document.getElementById('trainStatus');
+  const trainBanner = document.getElementById('trainBanner');
+  const steps = Array.from(document.querySelectorAll('#pipelineSteps .step'));
+  const metricsBlock = document.getElementById('metricsBlock');
+
+  function showBanner(el, kind, msg){
+    el.className = 'banner show ' + kind;
+    el.textContent = msg;
+  }
+  function hideBanner(el){ el.className = 'banner'; el.textContent=''; }
+
+  function metricBar(container, label, value){
+    const wrap = document.createElement('div');
+    wrap.className = 'metric';
+    const pct = Math.max(0, Math.min(100, value*100));
+    wrap.innerHTML = `
+      <div class="metric-top"><span class="name">${label}</span><span class="val">${(value*100).toFixed(1)}%</span></div>
+      <div class="meter"><div class="meter-fill" style="width:${pct}%;"></div></div>`;
+    container.appendChild(wrap);
+  }
+
+  let stepTimer = null;
+  function animateSteps(){
+    let i = 0;
+    steps.forEach(s => s.className = 'step');
+    stepTimer = setInterval(()=>{
+      if(i>0) steps[i-1].className = 'step done';
+      if(i < steps.length){ steps[i].className = 'step active'; i++; }
+      else { clearInterval(stepTimer); }
+    }, 900);
+  }
+  function finishSteps(){
+    if(stepTimer) clearInterval(stepTimer);
+    steps.forEach(s => s.className = 'step done');
+  }
+
+  trainBtn.addEventListener('click', async ()=>{
+    trainBtn.disabled = true;
+    hideBanner(trainBanner);
+    metricsBlock.style.display = 'none';
+    trainStatus.textContent = 'Running pipeline… this can take a minute.';
+    animateSteps();
+    const started = Date.now();
+    try{
+      const res = await fetch('/train');
+      const data = await res.json();
+      if(!res.ok){ throw new Error(data.detail || 'Training failed'); }
+      finishSteps();
+      const secs = data.elapsed_seconds != null ? data.elapsed_seconds : ((Date.now()-started)/1000).toFixed(1);
+      trainStatus.textContent = `Completed in ${secs}s`;
+      showBanner(trainBanner, 'ok', data.message || 'Training pipeline completed successfully.');
+
+      document.getElementById('trainMetrics').innerHTML = '';
+      document.getElementById('testMetrics').innerHTML = '';
+      if(data.train_metrics){
+        metricBar(document.getElementById('trainMetrics'), 'F1 score', data.train_metrics.f1_score);
+        metricBar(document.getElementById('trainMetrics'), 'Precision', data.train_metrics.precision_score);
+        metricBar(document.getElementById('trainMetrics'), 'Recall', data.train_metrics.recall_score);
+      }
+      if(data.test_metrics){
+        metricBar(document.getElementById('testMetrics'), 'F1 score', data.test_metrics.f1_score);
+        metricBar(document.getElementById('testMetrics'), 'Precision', data.test_metrics.precision_score);
+        metricBar(document.getElementById('testMetrics'), 'Recall', data.test_metrics.recall_score);
+      }
+      metricsBlock.style.display = 'block';
+      loadStatus();
+    }catch(e){
+      finishSteps();
+      trainStatus.textContent = 'Run failed.';
+      showBanner(trainBanner, 'err', 'Training failed: ' + e.message);
+    }finally{
+      trainBtn.disabled = false;
+    }
+  });
+
+  // ---------- SCAN ----------
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const fileNameEl = document.getElementById('fileName');
+  const scanBtn = document.getElementById('scanBtn');
+  const scanBanner = document.getElementById('scanBanner');
+  const downloadBtn = document.getElementById('downloadBtn');
+  let selectedFile = null;
+  let lastResult = null;
+  let activeFilter = 'all';
+
+  dropzone.addEventListener('click', ()=>{ if(!dropzone.classList.contains('disabled')) fileInput.click(); });
+  ['dragenter','dragover'].forEach(evt=>{
+    dropzone.addEventListener(evt, e=>{
+      e.preventDefault();
+      if(!dropzone.classList.contains('disabled')) dropzone.classList.add('drag');
+    });
+  });
+  ['dragleave','drop'].forEach(evt=>{
+    dropzone.addEventListener(evt, e=>{
+      e.preventDefault();
+      dropzone.classList.remove('drag');
+    });
+  });
+  dropzone.addEventListener('drop', e=>{
+    if(dropzone.classList.contains('disabled')) return;
+    const f = e.dataTransfer.files[0];
+    if(f) setFile(f);
+  });
+  fileInput.addEventListener('change', ()=>{
+    if(fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+  function setFile(f){
+    selectedFile = f;
+    fileNameEl.textContent = f.name;
+    scanBtn.disabled = false;
+    hideBanner(scanBanner);
+  }
+
+  scanBtn.addEventListener('click', async ()=>{
+    if(!selectedFile) return;
+    scanBtn.disabled = true;
+    scanBtn.textContent = 'Scanning…';
+    hideBanner(scanBanner);
+    try{
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+      const res = await fetch('/predict', { method:'POST', body: fd });
+      const data = await res.json();
+      if(!res.ok){ throw new Error(data.detail || 'Scan failed'); }
+      lastResult = data;
+      renderResults(data);
+      downloadBtn.style.display = 'inline-flex';
+    }catch(e){
+      showBanner(scanBanner, 'err', 'Scan failed: ' + e.message);
+    }finally{
+      scanBtn.disabled = false;
+      scanBtn.textContent = 'Run batch scan';
+    }
+  });
+
+  function renderResults(data){
+    document.getElementById('emptyState').style.display = 'none';
+    const table = document.getElementById('resultsTable');
+    table.style.display = 'table';
+    document.getElementById('summaryBar').style.display = 'flex';
+    document.getElementById('filters').style.display = 'flex';
+
+    document.getElementById('sumTotal').textContent = data.summary.total;
+    document.getElementById('sumLegit').textContent = data.summary.legitimate;
+    document.getElementById('sumPhish').textContent = data.summary.phishing;
+    const total = Math.max(1, data.summary.total);
+    document.getElementById('propLegit').style.width = (data.summary.legitimate/total*100) + '%';
+    document.getElementById('propPhish').style.width = (data.summary.phishing/total*100) + '%';
+
+    drawRows();
+  }
+
+  function drawRows(){
+    if(!lastResult) return;
+    const tbody = document.getElementById('resultsBody');
+    tbody.innerHTML = '';
+    const columns = lastResult.columns;
+
+    lastResult.rows.forEach((row, idx)=>{
+      const isPhish = row.prediction === -1;
+      const isLegit = row.prediction === 1;
+      if(activeFilter === 'phish' && !isPhish) return;
+      if(activeFilter === 'legit' && !isLegit) return;
+
+      const tr = document.createElement('tr');
+
+      const tdIdx = document.createElement('td');
+      tdIdx.className = 'idx';
+      tdIdx.textContent = idx + 1;
+
+      const tdFp = document.createElement('td');
+      const fp = document.createElement('div');
+      fp.className = 'row-fp';
+      const tooltipParts = [];
+      row.features.forEach((v, i)=>{
+        const i2 = document.createElement('i');
+        let h, bg;
+        if(v === 1){ h=90; bg='var(--teal)'; }
+        else if(v === -1){ h=55; bg='var(--rose)'; }
+        else { h=32; bg='var(--amber)'; }
+        i2.style.height = h + '%';
+        i2.style.background = bg;
+        fp.appendChild(i2);
+        if(columns && columns[i] !== undefined) tooltipParts.push(columns[i] + '=' + v);
+      });
+      fp.title = tooltipParts.join(', ');
+      tdFp.appendChild(fp);
+
+      const tdVerdict = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + (isLegit ? 'legit' : isPhish ? 'phish' : 'unknown');
+      badge.textContent = row.verdict;
+      tdVerdict.appendChild(badge);
+
+      tr.appendChild(tdIdx);
+      tr.appendChild(tdFp);
+      tr.appendChild(tdVerdict);
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('filters').addEventListener('click', e=>{
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    document.querySelectorAll('#filters .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    drawRows();
+  });
+
+  downloadBtn.addEventListener('click', ()=>{
+    if(!lastResult) return;
+    const cols = lastResult.columns.concat(['prediction','verdict']);
+    const lines = [cols.join(',')];
+    lastResult.rows.forEach(row=>{
+      lines.push(row.features.concat([row.prediction, row.verdict]).join(','));
+    });
+    const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'scan_results.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>

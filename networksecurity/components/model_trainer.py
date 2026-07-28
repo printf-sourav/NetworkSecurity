@@ -24,7 +24,10 @@ import mlflow
 from networksecurity.utils.main_utils.utils import evaluate_models
 
 import dagshub
-dagshub.init(repo_owner='printf-sourav', repo_name='NetworkSecurity', mlflow=True)
+try:
+    dagshub.init(repo_owner='printf-sourav', repo_name='NetworkSecurity', mlflow=True)
+except Exception as e:
+    logging.warning(f"Could not initialize DagShub: {e}. Continuing without DagShub integration.")
 
 
 class ModelTrainer:
